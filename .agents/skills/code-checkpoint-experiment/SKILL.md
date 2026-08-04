@@ -1,17 +1,17 @@
 ---
 name: code-checkpoint-experiment
-description: Run or advance a frontend, backend, or infrastructure experiment in this repository using a small stacked PR chain for design, independent review, and implementation, while filing concrete out-of-scope findings as GitHub issues. Use when creating an experiment, reviewing its intermediate design, implementing an approved design, recording results, or discovering follow-up work.
+description: このリポジトリで、frontend、backend、infraの実験を、設計、独立レビュー、実装の小さなPRチェーンで進め、スコープ外で見つけた具体的な問題をGitHub Issueへ残す。実験の作成、設計レビュー、承認済み設計の実装、結果記録、後続作業の発見時に使用する。
 ---
 
-# Code checkpoint experiment
+# コード生成のチェックポイント実験
 
-Keep the workflow small. Work in exactly one of `frontend/`, `backend/`, or `infra/` at a time, and do not couple the areas.
+作業を小さく保つ。`frontend/`、`backend/`、`infra/`のいずれか一つだけを対象にし、領域同士を結合しない。
 
-## Choose the task
+## 課題を選ぶ
 
-Choose one representative task that fits in a focused implementation PR. Define a concrete outcome and a few acceptance criteria. Avoid building shared experiment infrastructure.
+一つの実装PRに収まる代表的な課題を選ぶ。具体的な到達点と少数の受け入れ条件を決める。共通の実験基盤は作らない。
 
-Use this minimal area structure:
+各領域の構成は次の最小構成とする。
 
 ```text
 <area>/
@@ -20,80 +20,80 @@ Use this minimal area structure:
 └── <implementation files>
 ```
 
-## Create the PR chain
+## PRチェーンを作る
 
-Create three stacked branches and PRs:
+次の三つのブランチとPRを積み重ねる。
 
-1. `agent/<area>-design`, based on `main`
-2. `agent/<area>-review`, based on the design branch
-3. `agent/<area>-implementation`, based on the review branch
+1. `agent/<area>-design`を`main`から作る。
+2. `agent/<area>-review`を設計ブランチから作る。
+3. `agent/<area>-implementation`をレビューブランチから作る。
 
-Merge them in the same order. Keep each PR limited to its checkpoint.
+同じ順番でマージする。各PRには、そのチェックポイントの変更だけを含める。
 
-## Design checkpoint
+## 設計チェックポイント
 
-Write only `<area>/design.md`. Include:
+`<area>/design.md`だけを書く。次の内容を含める。
 
-- goal
-- scope and non-goals
-- proposed approach
-- acceptance criteria
-- verification method
-- unresolved decisions
+- 目的
+- スコープと対象外
+- 採用する方針
+- 受け入れ条件
+- 検証方法
+- 未決定事項
 
-Keep the design at the level needed to choose an approach. Leave ordinary coding details to implementation.
+方針を選べる粒度に留め、通常のコーディング詳細は実装時に決める。
 
-Wait for human approval before starting the review checkpoint.
+人間が承認するまで、レビューチェックポイントへ進まない。
 
-## Review checkpoint
+## レビューチェックポイント
 
-Review the design from a fresh context. Use only the stated task and `design.md`; do not rely on the design author's conversation.
+新しいコンテキストで設計をレビューする。設計者との会話に依存せず、提示された課題と`design.md`だけを使用する。
 
-Check correctness, missing decisions, simplicity, testability, and area-specific risks. Prefer removing unnecessary complexity over covering speculative cases.
+正しさ、未決定事項、単純さ、テスト可能性、領域固有のリスクを確認する。想像上のケースを増やすより、不要な複雑さを取り除く。
 
-Write `<area>/review.md` with:
+`<area>/review.md`に次の内容を書く。
 
-- issues that should be addressed
-- suggestions intentionally rejected and why
-- final assessment
+- 対応すべき問題
+- 採用しない提案とその理由
+- 最終評価
 
-Update `design.md` only for accepted findings. Do not add implementation code.
+採用した指摘だけを`design.md`へ反映する。実装コードは追加しない。
 
-Wait for human approval before implementation.
+人間が承認するまで実装へ進まない。
 
-## Implementation checkpoint
+## 実装チェックポイント
 
-Implement only the approved design. Add the smallest useful tests and GitHub Actions checks needed to prove the code is valid for its area.
+承認済みの設計だけを実装する。コードが対象領域で有効だと確認できる、必要最小限のテストとGitHub Actionsのチェックを追加する。
 
-If a new product or architecture decision appears, stop and return to the design checkpoint. Do not silently expand the scope.
+新しいプロダクトまたはアーキテクチャの判断が必要になったら作業を止め、設計チェックポイントへ戻る。黙ってスコープを広げない。
 
-Before publishing the implementation PR:
+実装PRを公開する前に、次を行う。
 
-1. Run the relevant formatter, linter or static check, tests, and build or validation command.
-2. Self-review the complete diff for correctness and unnecessary complexity.
-3. Note the first CI failures instead of erasing them from the experiment record.
+1. 関連するフォーマッター、lintまたは静的チェック、テスト、ビルドまたは構文検証を実行する。
+2. 差分全体をセルフレビューし、正しさと不要な複雑さを確認する。
+3. 初回CIでの失敗を消さず、実験結果として記録する。
 
-## File discovered problems
+## 発見した問題をIssueへ残す
 
-When a concrete problem is discovered and fixing it would expand the current checkpoint or PR, create a GitHub issue without asking for separate approval.
+具体的な問題を発見し、現在のチェックポイントまたはPRで直すとスコープが広がる場合は、個別の確認なしでGitHub Issueを作成する。
 
-Before creating it, search for an existing issue. Combine closely related findings. Include:
+起票前に既存Issueを検索し、密接に関連する問題はまとめる。Issueには次の内容を含める。
 
-- observed problem
-- evidence or relevant location
-- why it is outside the current PR
-- possible next step
+- 確認した問題
+- 根拠または関連する場所
+- 現在のPRでは扱わない理由
+- 考えられる次の対応
 
-Do not file speculative concerns, style preferences, or problems already fixed by the current change. Continue the current task after filing unless the finding invalidates the approved design or makes implementation unsafe.
+憶測、書き方だけの好み、現在の変更ですでに解決した問題は起票しない。問題が承認済みの設計を無効にするか、実装を危険にする場合を除き、起票後も現在の作業を続ける。
 
-## Record the result
+## 結果を記録する
 
-After the implementation is verified, add a short result to the repository README covering only:
+実装を検証した後、次の内容だけをリポジトリのREADMEへ短く追記する。
 
-- problems prevented by design review
-- design rework discovered during implementation
-- first-run CI failures
-- unnecessary complexity found
-- whether the three-checkpoint split helped
+- 設計レビューで防げた問題
+- 実装中に判明した設計のやり直し
+- 初回CIの失敗
+- 見つかった不要な複雑さ
+- 三つのチェックポイントへの分割が役立ったか
 
-Do not add a separate reporting framework unless several experiments demonstrate the need.
+複数の実験で必要性が明らかになるまでは、別のレポート機構を追加しない。
