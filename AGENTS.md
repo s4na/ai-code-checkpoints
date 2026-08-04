@@ -17,6 +17,15 @@ This repository explores where human review checkpoints improve AI-generated cod
 - Treat human approval of each checkpoint as required before starting the next one.
 - Stop and ask when implementation requires a product or architecture decision not settled by the approved design.
 
+## Capture discovered problems
+
+- In this repository, create GitHub issues without asking for separate approval when concrete follow-up work is discovered.
+- Create an issue when fixing the problem in the current PR would expand its checkpoint or scope.
+- Check for an existing issue first. Combine closely related findings instead of creating duplicates.
+- Include the observed problem, evidence or location, why it is outside the current PR, and a possible next step.
+- Do not create issues for speculation, style-only preferences, or findings already fixed by the current change.
+- Continue the current task after filing the issue unless the finding invalidates the approved design or makes the implementation unsafe.
+
 ## Verify generated code
 
 - Add the smallest relevant automated checks with the implementation.
