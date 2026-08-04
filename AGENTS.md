@@ -1,41 +1,47 @@
-# Repository guidance
+# リポジトリの作業方針
 
-This repository explores where human review checkpoints improve AI-generated code.
+このリポジトリでは、AIが生成するコードに人間のレビューを挟むと、どの段階で効果があるかを検証する。
 
-## Keep the experiment small
+## 実験を小さく保つ
 
-- Keep `frontend/`, `backend/`, and `infra/` independent.
-- Prefer one small, representative task per area over a connected sample system.
-- Add only the files, dependencies, and tooling needed for the current experiment.
-- Do not introduce an experiment framework, metadata format, or reporting system until repeated work proves it useful.
+- `frontend/`、`backend/`、`infra/`は独立させる。
+- 連携するサンプルシステムより、領域ごとの小さく代表的な課題を優先する。
+- 現在の実験に必要なファイル、依存関係、ツールだけを追加する。
+- 繰り返し必要になると分かるまでは、実験基盤、メタデータ形式、レポート機構を追加しない。
 
-## Work in checkpoints
+## 日本語で記述する
 
-- Use the `code-checkpoint-experiment` skill for experiment work.
-- Create a stacked PR chain for each area in this order: design, review, implementation.
-- Do not include implementation code in the design or review PR.
-- Treat human approval of each checkpoint as required before starting the next one.
-- Stop and ask when implementation requires a product or architecture decision not settled by the approved design.
+- PRとIssueのタイトル・本文・コメント、コミットメッセージ、コードコメント、ドキュメントは、日本語で自然に書けるものを日本語で書く。
+- 識別子、コマンド、ファイル名、API名、ライブラリ名、外部仕様の正式名称は無理に日本語化しない。
+- ユーザーが言語を指定した場合は、その指定を優先する。
 
-## Capture discovered problems
+## チェックポイントごとに進める
 
-- In this repository, create GitHub issues without asking for separate approval when concrete follow-up work is discovered.
-- Create an issue when fixing the problem in the current PR would expand its checkpoint or scope.
-- Check for an existing issue first. Combine closely related findings instead of creating duplicates.
-- Include the observed problem, evidence or location, why it is outside the current PR, and a possible next step.
-- Do not create issues for speculation, style-only preferences, or findings already fixed by the current change.
-- Continue the current task after filing the issue unless the finding invalidates the approved design or makes the implementation unsafe.
+- 実験作業では`code-checkpoint-experiment`スキルを使用する。
+- 各領域で、設計、レビュー、実装の順にPRチェーンを作成する。
+- 設計PRとレビューPRに実装コードを含めない。
+- 次のチェックポイントへ進む前に、人間の承認を必須とする。
+- 承認済みの設計で決まっていないプロダクトやアーキテクチャの判断が実装中に必要になったら、作業を止めて確認する。
 
-## Verify generated code
+## 発見した問題をIssueへ残す
 
-- Add the smallest relevant automated checks with the implementation.
-- Frontend should eventually cover formatting, linting, type checking, tests, and build validity.
-- Backend should eventually cover formatting, static checks, and tests.
-- Infra should eventually cover formatting, validation, and linting without requiring cloud credentials.
-- Record first-run CI failures; they are experiment results, not merely cleanup work.
+- このリポジトリでは、具体的な後続作業を発見したら、個別の確認なしでGitHub Issueを作成してよい。
+- 現在のPRで直すとチェックポイントまたはスコープが広がる問題をIssueへ切り出す。
+- 起票前に既存Issueを確認し、密接に関連する問題はまとめて重複を避ける。
+- Issueには、確認した問題、根拠または場所、現在のPRでは扱わない理由、考えられる次の対応を書く。
+- 憶測、書き方だけの好み、現在の変更ですでに解決した問題はIssueにしない。
+- 問題が承認済みの設計を無効にするか、実装を危険にする場合を除き、起票後も現在の作業を続ける。
 
-## Review priorities
+## 生成コードを検証する
 
-- Check correctness, scope, simplicity, and testability.
-- Flag unnecessary abstraction, generalization, dependencies, and speculative edge cases.
-- Keep rejected review suggestions in the record with a short reason.
+- 実装と一緒に、必要最小限の自動チェックを追加する。
+- frontendでは、最終的にフォーマット、lint、型チェック、テスト、ビルドを確認できるようにする。
+- backendでは、最終的にフォーマット、静的チェック、テストを確認できるようにする。
+- infraでは、クラウド認証なしでフォーマット、構文検証、lintを確認できるようにする。
+- 初回CIの失敗は単なる修正作業ではなく実験結果として記録する。
+
+## レビューで優先すること
+
+- 正しさ、スコープ、単純さ、テスト可能性を確認する。
+- 不要な抽象化、汎用化、依存関係、想像上のエッジケースを指摘する。
+- 採用しないレビュー提案も、短い理由とともに記録する。
