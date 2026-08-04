@@ -1,6 +1,6 @@
 ---
 name: code-checkpoint-experiment
-description: Run or advance a frontend, backend, or infrastructure experiment in this repository using a small stacked PR chain for design, independent review, and implementation. Use when creating an experiment, reviewing its intermediate design, implementing an approved design, or recording whether the checkpoints were useful.
+description: Run or advance a frontend, backend, or infrastructure experiment in this repository using a small stacked PR chain for design, independent review, and implementation, while filing concrete out-of-scope findings as GitHub issues. Use when creating an experiment, reviewing its intermediate design, implementing an approved design, recording results, or discovering follow-up work.
 ---
 
 # Code checkpoint experiment
@@ -72,6 +72,19 @@ Before publishing the implementation PR:
 1. Run the relevant formatter, linter or static check, tests, and build or validation command.
 2. Self-review the complete diff for correctness and unnecessary complexity.
 3. Note the first CI failures instead of erasing them from the experiment record.
+
+## File discovered problems
+
+When a concrete problem is discovered and fixing it would expand the current checkpoint or PR, create a GitHub issue without asking for separate approval.
+
+Before creating it, search for an existing issue. Combine closely related findings. Include:
+
+- observed problem
+- evidence or relevant location
+- why it is outside the current PR
+- possible next step
+
+Do not file speculative concerns, style preferences, or problems already fixed by the current change. Continue the current task after filing unless the finding invalidates the approved design or makes implementation unsafe.
 
 ## Record the result
 
