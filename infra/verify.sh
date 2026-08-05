@@ -26,19 +26,20 @@ for _ in $(seq 1 60); do
   sleep 1
 done
 aws s3api head-object --bucket "$result_bucket" --key processed/valid.json >/dev/null
-aws dynamodb get-item --table-name "$status_table" --key '{"object_key":{"S":"valid.json"}}' \
-  --query 'Item.status.S' --output text | grep -qx SUCCEEDED
+status_result="$(aws dynamodb get-item --table-name "$status_table" --key '{"object_key":{"S":"valid.json"}}' \
+  --query '[Item.status.S, Item.result_key.S]' --output text)"
+[ "$status_result" = $'SUCCEEDED\tprocessed/valid.json' ]
 
-aws s3 cp "$invalid_file" "s3://$input_bucket/invalid.json"
+aws sqs purge-queue --queue-url "$dlq_url"
+invalid_key="invalid-$(date +%s).json"
+aws s3 cp "$invalid_file" "s3://$input_bucket/$invalid_key"
 for _ in $(seq 1 360); do
-  count="$(aws sqs get-queue-attributes --queue-url "$dlq_url" --attribute-names ApproximateNumberOfMessages \
-    --query 'Attributes.ApproximateNumberOfMessages' --output text)"
-  if [ "$count" -ge 1 ]; then
+  body="$(aws sqs receive-message --queue-url "$dlq_url" --wait-time-seconds 1 \
+    --query 'Messages[0].Body' --output text)"
+  if [[ "$body" == *"$invalid_key"* ]]; then
     exit 0
   fi
-  sleep 1
 done
 
 echo "不正JSONが制限時間内にDead Letter Queueへ移動しませんでした" >&2
 exit 1
-

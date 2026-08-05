@@ -1,6 +1,7 @@
 services:
   floci:
     image: floci/floci:1.5.14
+    user: root
     ports:
       - "4566:4566"
     volumes:
@@ -10,4 +11,3 @@ services:
       interval: 2s
       timeout: 2s
       retries: 30
-
