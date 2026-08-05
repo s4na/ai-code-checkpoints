@@ -1,0 +1,13 @@
+services:
+  floci:
+    image: floci/floci:1.5.14
+    ports:
+      - "4566:4566"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:4566/_localstack/health"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+
