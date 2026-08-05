@@ -18,19 +18,22 @@ trap 'rm -f "$valid_file" "$invalid_file"' EXIT
 printf '{"message":"hello"}\n' >"$valid_file"
 printf 'not-json\n' >"$invalid_file"
 
-aws s3 cp "$valid_file" "s3://$input_bucket/valid.json"
+valid_key="valid-$(date +%s).json"
+result_key="processed/$valid_key"
+aws s3 cp "$valid_file" "s3://$input_bucket/$valid_key"
 for _ in $(seq 1 60); do
-  if aws s3api head-object --bucket "$result_bucket" --key processed/valid.json >/dev/null 2>&1; then
+  if aws s3api head-object --bucket "$result_bucket" --key "$result_key" >/dev/null 2>&1; then
     break
   fi
   sleep 1
 done
-aws s3api head-object --bucket "$result_bucket" --key processed/valid.json >/dev/null
-status_result="$(aws dynamodb get-item --table-name "$status_table" --key '{"object_key":{"S":"valid.json"}}' \
+aws s3api head-object --bucket "$result_bucket" --key "$result_key" >/dev/null
+status_result="$(aws dynamodb get-item --table-name "$status_table" \
+  --key "{\"object_key\":{\"S\":\"$valid_key\"}}" \
   --query '[Item.status.S, Item.result_key.S]' --output text)"
-[ "$status_result" = $'SUCCEEDED\tprocessed/valid.json' ]
+expected_status_result="$(printf 'SUCCEEDED\t%s' "$result_key")"
+[ "$status_result" = "$expected_status_result" ]
 
-aws sqs purge-queue --queue-url "$dlq_url"
 invalid_key="invalid-$(date +%s).json"
 aws s3 cp "$invalid_file" "s3://$input_bucket/$invalid_key"
 for _ in $(seq 1 360); do

@@ -44,7 +44,9 @@ jobs:
         with:
           terraform_version: "1.10.5"
       - name: Flociを起動
-        run: docker compose up -d --wait
+        run: |
+          docker compose up -d
+          curl --fail --retry 30 --retry-delay 2 --retry-all-errors http://localhost:4566/_localstack/health
       - name: Terraformを初期化
         run: terraform init -backend=false
       - name: Flociへデプロイ

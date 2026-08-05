@@ -53,7 +53,18 @@ class ProcessRecordTest(unittest.TestCase):
         with self.assertRaises(json.JSONDecodeError):
             handler.process_record(sqs_record(), FakeS3(b"not-json"), FakeDynamoDB())
 
+    def test_s3_test_event_is_ignored(self):
+        s3 = FakeS3(b"")
+        dynamodb = FakeDynamoDB()
+
+        processed = handler.process_record(
+            {"body": json.dumps({"Event": "s3:TestEvent"})}, s3, dynamodb
+        )
+
+        self.assertFalse(processed)
+        self.assertEqual(s3.puts, [])
+        self.assertEqual(dynamodb.puts, [])
+
 
 if __name__ == "__main__":
     unittest.main()
-

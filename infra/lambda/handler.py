@@ -12,6 +12,9 @@ def _clients():
 
 def process_record(record, s3, dynamodb, now=None):
     event = json.loads(record["body"])
+    if event.get("Event") == "s3:TestEvent":
+        return False
+
     s3_record = event["Records"][0]["s3"]
     input_bucket = s3_record["bucket"]["name"]
     object_key = unquote_plus(s3_record["object"]["key"])
@@ -37,12 +40,11 @@ def process_record(record, s3, dynamodb, now=None):
             "result_key": {"S": result_key},
         },
     )
+    return True
 
 
 def handler(event, _context):
     s3, dynamodb = _clients()
-    for record in event["Records"]:
-        process_record(record, s3, dynamodb)
+    processed = sum(process_record(record, s3, dynamodb) for record in event["Records"])
 
-    return {"processed": len(event["Records"])}
-
+    return {"processed": processed}
