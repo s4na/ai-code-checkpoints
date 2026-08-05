@@ -1,0 +1,65 @@
+name: infra
+
+on:
+  pull_request:
+    paths:
+      - "infra/**"
+      - ".github/workflows/infra.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  static-checks:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: infra
+    steps:
+      - uses: actions/checkout@v5
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.10.5"
+      - uses: terraform-linters/setup-tflint@v5
+        with:
+          tflint_version: v0.59.1
+      - run: terraform fmt -check -recursive
+      - run: terraform init -backend=false
+      - run: terraform validate
+      - run: tflint --init
+      - run: tflint
+      - name: Lambda unit test
+        run: python -m unittest discover -s lambda -p 'test_*.py'
+
+  end-to-end:
+    needs: static-checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: infra
+    steps:
+      - uses: actions/checkout@v5
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.10.5"
+      - name: Flociを起動
+        run: |
+          docker compose up -d
+          curl --fail --retry 30 --retry-delay 2 --retry-all-errors http://localhost:4566/_localstack/health
+      - name: Terraformを初期化
+        run: terraform init -backend=false
+      - name: Flociへデプロイ
+        run: terraform apply -auto-approve
+      - name: 非同期処理を検証
+        run: ./verify.sh
+      - name: 失敗時のFlociログ
+        if: failure()
+        run: docker compose logs
+      - name: Terraformリソースを削除
+        if: always()
+        continue-on-error: true
+        run: terraform destroy -auto-approve
+      - name: Flociを停止
+        if: always()
+        run: docker compose down

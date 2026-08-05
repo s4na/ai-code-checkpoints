@@ -1,0 +1,13 @@
+name: ai-code-checkpoints
+
+services:
+  floci:
+    image: floci/floci:1.5.14
+    user: root
+    environment:
+      FLOCI_HOSTNAME: floci
+      FLOCI_SERVICES_LAMBDA_DOCKER_NETWORK: ai-code-checkpoints_default
+    ports:
+      - "4566:4566"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
